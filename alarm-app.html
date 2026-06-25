@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アラームアプリ</title>
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --card: #16213e;
+      --accent: #e94560;
+      --accent2: #0f3460;
+      --text: #eaeaea;
+      --text-muted: #888;
+      --border: #2a2a4a;
+      --green: #4ecca3;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .clock {
+      font-size: 4rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      margin: 16px 0 32px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="time"] {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1.4rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="time"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.97); }
+
+    .alarm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alarm-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: opacity 0.2s;
+    }
+
+    .alarm-item.off {
+      opacity: 0.45;
+    }
+
+    .alarm-item.ringing {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(233,69,96,0.4);
+      animation: pulse 0.6s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: 0 0 8px rgba(233,69,96,0.3); }
+      to   { box-shadow: 0 0 24px rgba(233,69,96,0.7); }
+    }
+
+    .alarm-time {
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      min-width: 80px;
+    }
+
+    .alarm-label {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track {
+      background: var(--green);
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: left 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track::after {
+      left: 23px;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .delete-btn:hover {
+      color: var(--accent);
+      background: rgba(233,69,96,0.1);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 24px 0;
+    }
+
+    /* モーダル */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 0 40px rgba(233,69,96,0.4);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .modal .bell {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      animation: ring 0.4s infinite alternate;
+    }
+
+    @keyframes ring {
+      from { transform: rotate(-15deg); }
+      to   { transform: rotate(15deg); }
+    }
+
+    .modal h3 {
+      font-size: 1.4rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .modal p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .modal .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⏰ アラーム</h1>
+<div class="clock" id="clock">00:00:00</div>
+
+<div class="card">
+  <h2>新しいアラームを追加</h2>
+  <div class="input-row">
+    <input type="time" id="timeInput">
+    <input type="text" id="labelInput" placeholder="ラベル（任意）" maxlength="20">
+  </div>
+  <button class="btn" onclick="addAlarm()">＋ 追加</button>
+</div>
+
+<div class="card">
+  <h2>アラーム一覧</h2>
+  <div class="alarm-list" id="alarmList">
+    <div class="empty">アラームがまだありません</div>
+  </div>
+</div>
+
+<!-- 鳴動モーダル -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="bell">🔔</div>
+    <h3 id="modalTime">07:00</h3>
+    <p id="modalLabel">アラーム</p>
+    <button class="btn" onclick="stopAlarm()">止める</button>
+  </div>
+</div>
+
+<script>
+  let alarms = JSON.parse(localStorage.getItem('alarms') || '[]');
+  let ringingId = null;
+  let audioCtx = null;
+  let gainNode = null;
+  let oscillators = [];
+
+  // 時計更新
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    checkAlarms(h, m, s);
+  }
+
+  function checkAlarms(h, m, s) {
+    if (s !== '00') return;
+    const hm = `${h}:${m}`;
+    alarms.forEach(a => {
+      if (a.enabled && a.time === hm && ringingId === null) {
+        triggerAlarm(a);
+      }
+    });
+  }
+
+  function triggerAlarm(alarm) {
+    ringingId = alarm.id;
+    document.getElementById('modalTime').textContent = alarm.time;
+    document.getElementById('modalLabel').textContent = alarm.label || 'アラーム';
+    document.getElementById('modalOverlay').classList.add('show');
+    const item = document.getElementById(`alarm-${alarm.id}`);
+    if (item) item.classList.add('ringing');
+    playSound();
+  }
+
+  function stopAlarm() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    if (ringingId !== null) {
+      const item = document.getElementById(`alarm-${ringingId}`);
+      if (item) item.classList.remove('ringing');
+      ringingId = null;
+    }
+    stopSound();
+  }
+
+  function playSound() {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gainNode.connect(audioCtx.destination);
+
+      function beep() {
+        if (!audioCtx) return;
+        const freqs = [880, 1100, 880, 0];
+        freqs.forEach((f, i) => {
+          if (f === 0) return;
+          const osc = audioCtx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.15);
+          osc.connect(gainNode);
+          osc.start(audioCtx.currentTime + i * 0.15);
+          osc.stop(audioCtx.currentTime + i * 0.15 + 0.12);
+          oscillators.push(osc);
+        });
+      }
+
+      beep();
+      const interval = setInterval(() => {
+        if (!audioCtx) { clearInterval(interval); return; }
+        beep();
+      }, 1000);
+      audioCtx._interval = interval;
+    } catch(e) {}
+  }
+
+  function stopSound() {
+    try {
+      if (audioCtx) {
+        clearInterval(audioCtx._interval);
+        oscillators.forEach(o => { try { o.stop(); } catch(e){} });
+        oscillators = [];
+        audioCtx.close();
+        audioCtx = null;
+      }
+    } catch(e) {}
+  }
+
+  function addAlarm() {
+    const time = document.getElementById('timeInput').value;
+    const label = document.getElementById('labelInput').value.trim();
+    if (!time) { alert('時刻を入力してください'); return; }
+
+    alarms.push({ id: Date.now(), time, label, enabled: true });
+    alarms.sort((a, b) => a.time.localeCompare(b.time));
+    save();
+    render();
+    document.getElementById('labelInput').value = '';
+  }
+
+  function toggleAlarm(id) {
+    const a = alarms.find(x => x.id === id);
+    if (a) { a.enabled = !a.enabled; save(); render(); }
+  }
+
+  function deleteAlarm(id) {
+    alarms = alarms.filter(x => x.id !== id);
+    save();
+    render();
+  }
+
+  function save() {
+    localStorage.setItem('alarms', JSON.stringify(alarms));
+  }
+
+  function render() {
+    const list = document.getElementById('alarmList');
+    if (alarms.length === 0) {
+      list.innerHTML = '<div class="empty">アラームがまだありません</div>';
+      return;
+    }
+    list.innerHTML = alarms.map(a => `
+      <div class="alarm-item ${a.enabled ? '' : 'off'}" id="alarm-${a.id}">
+        <div class="alarm-time">${a.time}</div>
+        <div class="alarm-label">${a.label || '—'}</div>
+        <label class="toggle">
+          <input type="checkbox" ${a.enabled ? 'checked' : ''} onchange="toggleAlarm(${a.id})">
+          <div class="toggle-track"></div>
+        </label>
+        <button class="delete-btn" onclick="deleteAlarm(${a.id})" title="削除">✕</button>
+      </div>
+    `).join('');
+  }
+
+  render();
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
