@@ -1,0 +1,35 @@
+{
+  "indices": {
+    "^spx": "S&P 500",
+    "^ndq": "NASDAQ総合",
+    "^dji": "NYダウ",
+    "^nkx": "日経平均"
+  },
+  "forex": {
+    "usdjpy": "米ドル/円"
+  },
+  "watchlist": {
+    "aapl.us": "Apple",
+    "msft.us": "Microsoft",
+    "nvda.us": "NVIDIA",
+    "amzn.us": "Amazon",
+    "googl.us": "Alphabet",
+    "7203.jp": "トヨタ自動車",
+    "6758.jp": "ソニーグループ",
+    "9984.jp": "ソフトバンクグループ",
+    "8035.jp": "東京エレクトロン",
+    "6501.jp": "日立製作所"
+  },
+  "news_feeds": [
+    {"name": "NHK 経済ニュース", "url": "https://www3.nhk.or.jp/rss/news/cat5.xml"},
+    {"name": "Yahoo!ニュース 経済", "url": "https://news.yahoo.co.jp/rss/topics/business.xml"},
+    {"name": "CNBC Finance", "url": "https://www.cnbc.com/id/10001147/device/rss/rss.html"},
+    {"name": "MarketWatch Top Stories", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories"}
+  ],
+  "sns_feeds": [
+    {"name": "Reddit r/stocks", "url": "https://www.reddit.com/r/stocks/hot.rss"},
+    {"name": "Reddit r/investing", "url": "https://www.reddit.com/r/investing/hot.rss"},
+    {"name": "Reddit r/wallstreetbets", "url": "https://www.reddit.com/r/wallstreetbets/hot.rss"}
+  ],
+  "max_items_per_feed": 8
+}
