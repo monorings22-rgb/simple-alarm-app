@@ -1,0 +1,28 @@
+{
+  "profile": {
+    "interests": [
+      "投資・資産運用",
+      "AI・プログラミングの活用",
+      "生活を効率化するツールやライフハック"
+    ],
+    "strengths": [
+      "個人投資家としての実践経験",
+      "AIツールを日常や副業に取り入れて試すのが好き"
+    ],
+    "target_platforms": ["X (Twitter)", "YouTube", "note"],
+    "goal": "半年でフォロワーを増やし、将来的にアフィリエイトやコンテンツ販売で収益化したい",
+    "available_time": "平日1時間程度、週末はまとまった時間が取れる"
+  },
+  "trend_feeds": [
+    {"name": "Googleトレンド(日本・急上昇)", "url": "https://trends.google.co.jp/trending/rss?geo=JP"},
+    {"name": "はてなブックマーク 総合", "url": "https://b.hatena.ne.jp/hotentry/all.rss"},
+    {"name": "はてなブックマーク テクノロジー", "url": "https://b.hatena.ne.jp/hotentry/it.rss"},
+    {"name": "はてなブックマーク 暮らし", "url": "https://b.hatena.ne.jp/hotentry/life.rss"},
+    {"name": "はてなブックマーク 学び", "url": "https://b.hatena.ne.jp/hotentry/knowledge.rss"},
+    {"name": "はてなブックマーク 政治と経済", "url": "https://b.hatena.ne.jp/hotentry/economics.rss"},
+    {"name": "NHK 主要ニュース", "url": "https://www3.nhk.or.jp/rss/news/cat0.xml"}
+  ],
+  "max_items_per_feed": 10,
+  "num_candidates": 8,
+  "num_deep_dives": 3
+}
