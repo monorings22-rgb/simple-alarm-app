@@ -125,13 +125,18 @@
   }
   .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 
-  /* 当日の流れ（タイムライン） */
-  .flow{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
-  .flow li{ display:grid; grid-template-columns:90px 1fr; gap:20px; padding:14px 0; border-bottom:1px dashed var(--line); }
-  .flow li:last-child{ border-bottom:0; }
-  .flow .t{ color:var(--wine); font-weight:600; letter-spacing:.08em; font-variant-numeric:tabular-nums; }
-  .flow .ev{ font-size:15px; }
-  .flow .ev small{ display:block; color:var(--ink-soft); font-size:12.5px; letter-spacing:.04em; }
+  /* 当日の流れ（軽め・時間なし） */
+  .flowhead{ display:flex; align-items:baseline; gap:14px; margin:38px 0 20px; }
+  .flowhead .ja{ color:var(--wine); font-size:19px; letter-spacing:.12em; }
+  .flowhead .en{ color:var(--gold); font-size:11px; letter-spacing:.24em; }
+  .flowlite{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px 4px;
+  }
+  .flowlite .step{ font-size:16px; letter-spacing:.06em; padding:2px 2px; }
+  .flowlite .step:not(:last-child)::after{
+    content:"›"; color:var(--gold); font-size:16px; margin-left:14px; opacity:.85;
+  }
 
   /* プロフィール */
   .profile{ display:grid; grid-template-columns:1fr auto 1fr; gap:22px; align-items:start; }
@@ -256,35 +261,23 @@
       これからの両家のお付き合いも、末永くよろしくお願い申し上げます。
     </p>
 
+    <!-- 当日の流れ（軽め・時間なし） -->
+    <p class="flowhead"><span class="ja mincho">当日の流れ</span><span class="en">FLOW OF THE DAY</span></p>
+    <ol class="flowlite">
+      <li class="step">始まりの挨拶</li>
+      <li class="step">両家の紹介</li>
+      <li class="step">観覧</li>
+      <li class="step">食事</li>
+      <li class="step">記念撮影</li>
+      <li class="step">結びの挨拶</li>
+    </ol>
+
     <p class="foot mincho">— 両家顔合わせ しおり —</p>
   </section>
 
-  <!-- ============ 3. 当日の流れ ============ -->
+  <!-- ============ 3. 二人のプロフィール ============ -->
   <section class="page">
-    <p class="kicker"><span class="no">02</span> スケジュール <span class="rule"></span></p>
-    <h2 class="title mincho">当日の流れ</h2>
-    <p class="subtitle">SCHEDULE OF THE DAY</p>
-
-    <ul class="flow">
-      <li><span class="t">11:00</span><span class="ev">受付・ご集合<small>会場にて両家集合</small></span></li>
-      <li><span class="t">11:15</span><span class="ev">はじめのご挨拶<small>進行役より開会のことば</small></span></li>
-      <li><span class="t">11:20</span><span class="ev">両家代表ご挨拶<small><span class="fill">（お父様より一言など）</span></small></span></li>
-      <li><span class="t">11:30</span><span class="ev">家族紹介<small>それぞれの家族をご紹介</small></span></li>
-      <li><span class="t">11:45</span><span class="ev">記念品・婚約記念品のお披露目<small><span class="fill">（指輪の交換など）</span></small></span></li>
-      <li><span class="t">12:00</span><span class="ev">乾杯・お食事<small>歓談のひととき</small></span></li>
-      <li><span class="t">13:30</span><span class="ev">記念撮影<small>両家揃って一枚</small></span></li>
-      <li><span class="t">14:00</span><span class="ev">結びのご挨拶・閉会<small>お開き</small></span></li>
-    </ul>
-
-    <p class="lead" style="margin-top:22px; color:var(--ink-soft); font-size:13px;">
-      ※ 時間はあくまで目安です。当日の雰囲気に合わせて、ゆったりお過ごしください。
-    </p>
-    <p class="foot mincho">02</p>
-  </section>
-
-  <!-- ============ 4. 二人のプロフィール ============ -->
-  <section class="page">
-    <p class="kicker"><span class="no">03</span> プロフィール <span class="rule"></span></p>
+    <p class="kicker"><span class="no">02</span> プロフィール <span class="rule"></span></p>
     <h2 class="title mincho">二人のプロフィール</h2>
     <p class="subtitle">PROFILE</p>
 
@@ -313,12 +306,12 @@
         <dl class="prow"><dt>ひとこと</dt><dd class="fill">自己紹介・意気込み</dd></dl>
       </div>
     </div>
-    <p class="foot mincho">03</p>
+    <p class="foot mincho">02</p>
   </section>
 
-  <!-- ============ 5. 両家の家族紹介 ============ -->
+  <!-- ============ 4. 両家の家族紹介 ============ -->
   <section class="page">
-    <p class="kicker"><span class="no">04</span> 家族紹介 <span class="rule"></span></p>
+    <p class="kicker"><span class="no">03</span> 家族紹介 <span class="rule"></span></p>
     <h2 class="title mincho">両家の家族紹介</h2>
     <p class="subtitle">OUR FAMILIES</p>
 
@@ -367,12 +360,12 @@
     <p class="lead" style="margin-top:22px; color:var(--ink-soft); font-size:13px;">
       ※ 写真枠をクリックしても入力はできません。写真は下記READMEの方法で差し替えるか、印刷後に貼り付けてください。
     </p>
-    <p class="foot mincho">04</p>
+    <p class="foot mincho">03</p>
   </section>
 
-  <!-- ============ 6. 二人の思い出 ============ -->
+  <!-- ============ 5. 二人の思い出 ============ -->
   <section class="page">
-    <p class="kicker"><span class="no">05</span> ストーリー <span class="rule"></span></p>
+    <p class="kicker"><span class="no">04</span> ストーリー <span class="rule"></span></p>
     <h2 class="title mincho">二人の思い出</h2>
     <p class="subtitle">FROM OUR FIRST MEETING TO THE PROPOSAL</p>
 
@@ -398,12 +391,12 @@
         <p class="desc fill">どんなプロポーズだったか、その時の気持ちを書きます。</p>
       </li>
     </ul>
-    <p class="foot mincho">05</p>
+    <p class="foot mincho">04</p>
   </section>
 
-  <!-- ============ 7. 今後の予定 ============ -->
+  <!-- ============ 6. 今後の予定 ============ -->
   <section class="page">
-    <p class="kicker"><span class="no">06</span> これから <span class="rule"></span></p>
+    <p class="kicker"><span class="no">05</span> これから <span class="rule"></span></p>
     <h2 class="title mincho">今後の予定</h2>
     <p class="subtitle">OUR PLANS</p>
 
@@ -437,12 +430,12 @@
         </div>
       </div>
     </div>
-    <p class="foot mincho">06</p>
+    <p class="foot mincho">05</p>
   </section>
 
-  <!-- ============ 8. 感謝のメッセージ ============ -->
+  <!-- ============ 7. 感謝のメッセージ ============ -->
   <section class="page thanks mincho">
-    <p class="kicker" style="width:100%; justify-content:center;"><span class="rule"></span><span class="no">07</span><span class="rule"></span></p>
+    <p class="kicker" style="width:100%; justify-content:center;"><span class="rule"></span><span class="no">06</span><span class="rule"></span></p>
     <p class="mark">結</p>
     <h2 class="title" style="text-align:center;">感謝をこめて</h2>
     <p class="subtitle" style="text-align:center;">WITH GRATITUDE</p>
@@ -461,14 +454,13 @@
 
 <script>
 (function(){
-  var KEY = 'kaoawase-shiori-v2';
+  var KEY = 'kaoawase-shiori-v3';
 
   // 入力できるようにする箇所（=しおりの中身すべて）
   var SELECTORS = [
     '.fill', '.rulefield',
     '.cover h1', '.season', '.names', '.families', '.meta',
-    '.lead',
-    '.t', '.ev',
+    '.lead', '.step',
     '.profile h3', '.role', '.prow dt', '.prow dd',
     '.house h3', '.rel', '.nm', '.note',
     '.when', '.what', '.desc',
