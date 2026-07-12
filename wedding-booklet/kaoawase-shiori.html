@@ -54,6 +54,8 @@
   }
   .btn:hover{ background:#682633; }
   .btn:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+  .btn-ghost{ background:transparent; color:var(--wine); }
+  .btn-ghost:hover{ background:var(--blush); }
 
   /* ---- ページ（A4） ---- */
   .page{
@@ -94,6 +96,13 @@
     display:inline-block; min-width:6em; border-bottom:1px dotted var(--field);
     color:var(--field); text-align:center; padding:0 .4em;
   }
+
+  /* ブラウザ上で直接入力できる欄 */
+  [contenteditable="true"]{ outline:none; border-radius:2px; cursor:text; transition:background .12s; }
+  [contenteditable="true"]:hover{ background:rgba(185,138,107,.12); }
+  [contenteditable="true"]:focus{ background:rgba(185,138,107,.18); box-shadow:0 0 0 2px var(--gold-soft); color:var(--ink); }
+  /* 一度でも入力された欄は本文色にする（JSで .done を付与） */
+  .fill.done, .rulefield.done{ color:var(--ink); font-weight:500; }
 
   /* =================== 1. 表紙 =================== */
   .cover{ align-items:center; justify-content:center; text-align:center; gap:0; }
@@ -182,6 +191,7 @@
     :root{ --app-bg:#fff; }
     body{ padding:0; background:#fff; }
     .toolbar{ display:none; }
+    [contenteditable]{ background:none !important; box-shadow:none !important; }
     .page{
       margin:0; box-shadow:none; width:auto; min-height:auto;
       page-break-after:always; break-after:page;
@@ -201,8 +211,11 @@
 <body>
 
   <div class="toolbar">
-    <p>両家顔合わせ しおりのテンプレートです。<span class="fill">【この色の文字】</span>と点線の欄を、おふたりの内容に書き換えてお使いください。「印刷 / PDF保存」からA4で出力できます（余白なし・背景の色や画像を有効にすると綺麗に出ます）。</p>
-    <button class="btn" onclick="window.print()">印刷 / PDF保存</button>
+    <p><strong>茶色の文字や点線の欄をクリックすると、そのまま入力できます。</strong>入力内容はこのブラウザに自動保存されるので、閉じても消えません。完成したら「印刷 / PDF保存」でA4出力できます（余白なし・背景のグラフィックを有効にすると綺麗です）。</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-ghost" id="reset" type="button">内容をリセット</button>
+      <button class="btn" id="print" type="button">印刷 / PDF保存</button>
+    </div>
   </div>
 
   <!-- ============ 1. 表紙 ============ -->
@@ -425,5 +438,50 @@
     <p class="foot">本日は誠にありがとうございました</p>
   </section>
 
+<script>
+(function(){
+  var KEY = 'kaoawase-shiori-v1';
+  var fields = [].slice.call(document.querySelectorAll('.fill, .rulefield'));
+
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+
+  fields.forEach(function(el, i){
+    el.setAttribute('contenteditable', 'true');
+    el.setAttribute('spellcheck', 'false');
+    el.dataset.k = i;
+    if (saved[i] != null) {
+      el.innerHTML = saved[i];
+      el.classList.add('done');
+    }
+  });
+
+  var timer;
+  function save(){
+    var data = {};
+    fields.forEach(function(el, i){ data[i] = el.innerHTML; });
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  document.addEventListener('input', function(e){
+    var el = e.target.closest && e.target.closest('.fill, .rulefield');
+    if (!el) return;
+    el.classList.add('done');
+    clearTimeout(timer);
+    timer = setTimeout(save, 300);
+  });
+
+  var printBtn = document.getElementById('print');
+  if (printBtn) printBtn.addEventListener('click', function(){ window.print(); });
+
+  var reset = document.getElementById('reset');
+  if (reset) reset.addEventListener('click', function(){
+    if (confirm('入力した内容をすべて消して、テンプレートの状態に戻します。よろしいですか？')) {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      location.reload();
+    }
+  });
+})();
+</script>
 </body>
 </html>
