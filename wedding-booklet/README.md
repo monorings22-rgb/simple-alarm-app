@@ -30,11 +30,18 @@
 
 ## 写真の入れ方
 
-「写真をここに」の枠（`.photo`）を、画像に差し替えられます。
+家族紹介の「写真」枠（`.mphoto`）は、一人ずつ画像に差し替えられます。
+`写真` の文字を消して、その中に `<img>` を入れてください。
 
 ```html
-<div class="photo"><img src="family.jpg" alt="" style="width:100%;height:100%;object-fit:cover;"></div>
+<div class="mphoto"><img src="father.jpg" alt=""></div>
 ```
+
+画像は枠に合わせて自動でトリミング表示されます。差し替えが難しい場合は、
+印刷後にL判・証明写真などを枠に貼り付けてもOKです。
+
+- 新郎家：父・母・姉・兄
+- 新婦家：父・母・弟
 
 ## 冊子にするには
 

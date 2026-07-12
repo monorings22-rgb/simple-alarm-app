@@ -6,7 +6,7 @@
 <title>両家顔合わせ しおり テンプレート</title>
 <style>
   :root{
-    --paper:#FBF8F3;      /* 和紙の生成り */
+    --paper:#FFFFFF;      /* 白地（印刷向け） */
     --ink:#2E2A2B;        /* 墨 */
     --ink-soft:#6B6260;   /* 淡墨 */
     --wine:#7A2E3A;       /* 葡萄色（アクセント） */
@@ -142,18 +142,23 @@
   .prow dt{ color:var(--ink-soft); letter-spacing:.08em; }
   .prow dd{ margin:0; }
 
-  /* 家族紹介 */
-  .fam{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
-  .fam .house{ }
-  .fam h3{ font-size:16px; letter-spacing:.14em; margin:0 0 12px; color:var(--wine); }
-  .photo{
-    aspect-ratio:4/3; border:1px dashed var(--field); border-radius:2px;
+  /* 家族紹介（一人ずつ写真付き） */
+  .fam{ display:flex; flex-direction:column; gap:26px; }
+  .house h3{ font-size:16px; letter-spacing:.14em; margin:0 0 14px; color:var(--wine); display:flex; align-items:center; gap:12px; }
+  .house h3::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .mgrid{ display:grid; gap:16px; }
+  .mgrid.g4{ grid-template-columns:repeat(4,1fr); }
+  .mgrid.g3{ grid-template-columns:repeat(3,1fr); }
+  .mcard{ text-align:center; }
+  .mphoto{
+    aspect-ratio:3/4; border:1px dashed var(--field); border-radius:2px;
     display:flex; align-items:center; justify-content:center; color:var(--field);
-    font-size:12px; letter-spacing:.2em; margin-bottom:12px; background:repeating-linear-gradient(45deg,#fff8,#fff8 10px,#0000 10px,#0000 20px);
+    font-size:11px; letter-spacing:.16em; margin-bottom:9px; overflow:hidden;
   }
-  .member{ display:grid; grid-template-columns:5em 1fr; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dotted var(--line); }
-  .member dt{ color:var(--ink-soft); }
-  .member dd{ margin:0; }
+  .mphoto img{ width:100%; height:100%; object-fit:cover; }
+  .mcard .rel{ color:var(--gold); font-size:11px; letter-spacing:.2em; margin:0 0 1px; }
+  .mcard .nm{ font-size:14px; letter-spacing:.05em; margin:0; }
+  .mcard .note{ color:var(--ink-soft); font-size:11.5px; line-height:1.65; margin:3px 0 0; }
 
   /* 思い出（縦タイムライン） */
   .memory{ list-style:none; margin:0; padding:0 0 0 22px; border-left:2px solid var(--gold-soft); display:flex; flex-direction:column; gap:22px; }
@@ -211,7 +216,7 @@
 <body>
 
   <div class="toolbar">
-    <p><strong>茶色の文字や点線の欄をクリックすると、そのまま入力できます。</strong>入力内容はこのブラウザに自動保存されるので、閉じても消えません。完成したら「印刷 / PDF保存」でA4出力できます（余白なし・背景のグラフィックを有効にすると綺麗です）。</p>
+    <p><strong>茶色の文字や点線の欄をクリックすると、そのまま入力できます。</strong>入力内容はこのブラウザに自動保存されるので、閉じても消えません。完成したら「印刷 / PDF保存」でA4出力できます（用紙：A4／余白：なし）。白地なので、そのまま印刷して持って行けます。</p>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-ghost" id="reset" type="button">内容をリセット</button>
       <button class="btn" id="print" type="button">印刷 / PDF保存</button>
@@ -252,11 +257,6 @@
       本日はどうぞお時間の許す限り、和やかにお過ごしいただけましたら幸いです。
       これからの両家のお付き合いも、末永くよろしくお願い申し上げます。
     </p>
-
-    <div class="card" style="margin-top:22px;">
-      <p style="margin:0 0 8px; color:var(--wine); letter-spacing:.1em;">本日の進行役</p>
-      <p style="margin:0;">進行役：<span class="rulefield">お名前</span>（<span class="fill">続柄</span>）</p>
-    </div>
 
     <p class="foot mincho">— 両家顔合わせ しおり —</p>
   </section>
@@ -327,24 +327,47 @@
     <div class="fam">
       <div class="house">
         <h3 class="mincho"><span class="fill">〇〇</span>家（新郎側）</h3>
-        <div class="photo">写真をここに</div>
-        <dl class="member"><dt>父</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>母</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>兄弟姉妹</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>　</dt><dd class="fill">（ご家族を追記）</dd></dl>
+        <div class="mgrid g4">
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">父</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">母</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">姉</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">兄</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+        </div>
       </div>
+
       <div class="house">
         <h3 class="mincho"><span class="fill">〇〇</span>家（新婦側）</h3>
-        <div class="photo">写真をここに</div>
-        <dl class="member"><dt>父</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>母</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>兄弟姉妹</dt><dd class="fill">お名前・ひとこと</dd></dl>
-        <dl class="member"><dt>　</dt><dd class="fill">（ご家族を追記）</dd></dl>
+        <div class="mgrid g3">
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">父</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">母</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+          <div class="mcard">
+            <div class="mphoto">写真</div>
+            <p class="rel">弟</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <p class="lead" style="margin-top:20px; color:var(--ink-soft); font-size:13px;">
-      ※ ペットや遠方のご家族も、写真やひとことで紹介すると場が和みます。
+    <p class="lead" style="margin-top:22px; color:var(--ink-soft); font-size:13px;">
+      ※ 写真枠をクリックしても入力はできません。写真は下記READMEの方法で差し替えるか、印刷後に貼り付けてください。
     </p>
     <p class="foot mincho">04</p>
   </section>
