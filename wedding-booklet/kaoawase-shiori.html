@@ -142,18 +142,16 @@
   .prow dt{ color:var(--ink-soft); letter-spacing:.08em; }
   .prow dd{ margin:0; }
 
-  /* 家族紹介（一人ずつ写真付き） */
-  .fam{ display:flex; flex-direction:column; gap:26px; }
-  .house h3{ font-size:16px; letter-spacing:.14em; margin:0 0 14px; color:var(--wine); display:flex; align-items:center; gap:12px; }
+  /* 家族紹介（左＝新郎側／右＝新婦側・一人ずつ写真付き） */
+  .fam{ display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+  .house h3{ font-size:15px; letter-spacing:.12em; margin:0 0 14px; color:var(--wine); display:flex; align-items:center; gap:10px; }
   .house h3::after{ content:""; flex:1; height:1px; background:var(--line); }
-  .mgrid{ display:grid; gap:16px; }
-  .mgrid.g4{ grid-template-columns:repeat(4,1fr); }
-  .mgrid.g3{ grid-template-columns:repeat(3,1fr); }
+  .mgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px 12px; }
   .mcard{ text-align:center; }
   .mphoto{
-    aspect-ratio:3/4; border:1px dashed var(--field); border-radius:2px;
+    height:34mm; border:1px dashed var(--field); border-radius:2px;
     display:flex; align-items:center; justify-content:center; color:var(--field);
-    font-size:11px; letter-spacing:.16em; margin-bottom:9px; overflow:hidden;
+    font-size:11px; letter-spacing:.16em; margin-bottom:8px; overflow:hidden;
   }
   .mphoto img{ width:100%; height:100%; object-fit:cover; }
   .mcard .rel{ color:var(--gold); font-size:11px; letter-spacing:.2em; margin:0 0 1px; }
@@ -327,7 +325,7 @@
     <div class="fam">
       <div class="house">
         <h3 class="mincho"><span class="fill">〇〇</span>家（新郎側）</h3>
-        <div class="mgrid g4">
+        <div class="mgrid">
           <div class="mcard">
             <div class="mphoto">写真</div>
             <p class="rel">父</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
@@ -349,7 +347,7 @@
 
       <div class="house">
         <h3 class="mincho"><span class="fill">〇〇</span>家（新婦側）</h3>
-        <div class="mgrid g3">
+        <div class="mgrid">
           <div class="mcard">
             <div class="mphoto">写真</div>
             <p class="rel">父</p><p class="nm fill">お名前</p><p class="note fill">ひとこと</p>
@@ -463,13 +461,36 @@
 
 <script>
 (function(){
-  var KEY = 'kaoawase-shiori-v1';
-  var fields = [].slice.call(document.querySelectorAll('.fill, .rulefield'));
+  var KEY = 'kaoawase-shiori-v2';
+
+  // 入力できるようにする箇所（=しおりの中身すべて）
+  var SELECTORS = [
+    '.fill', '.rulefield',
+    '.cover h1', '.season', '.names', '.families', '.meta',
+    '.lead',
+    '.t', '.ev',
+    '.profile h3', '.role', '.prow dt', '.prow dd',
+    '.house h3', '.rel', '.nm', '.note',
+    '.when', '.what', '.desc',
+    '.plan h3', '.plan p', '.badge',
+    '.body', '.sign', '.date',
+    'h2.title', '.subtitle', '.en'
+  ].join(',');
+
+  // 候補を集め、入れ子は外側だけ残す（二重編集を防ぐ）
+  var all = [].slice.call(document.querySelectorAll(SELECTORS));
+  var set = all.filter(function(el){
+    for (var p = el.parentElement; p; p = p.parentElement) {
+      if (all.indexOf(p) !== -1) return false;
+    }
+    return true;
+  });
 
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
 
-  fields.forEach(function(el, i){
+  set.forEach(function(el, i){
+    el.classList.add('ceditable');
     el.setAttribute('contenteditable', 'true');
     el.setAttribute('spellcheck', 'false');
     el.dataset.k = i;
@@ -482,12 +503,12 @@
   var timer;
   function save(){
     var data = {};
-    fields.forEach(function(el, i){ data[i] = el.innerHTML; });
+    set.forEach(function(el, i){ data[i] = el.innerHTML; });
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
   }
 
   document.addEventListener('input', function(e){
-    var el = e.target.closest && e.target.closest('.fill, .rulefield');
+    var el = e.target.closest && e.target.closest('.ceditable');
     if (!el) return;
     el.classList.add('done');
     clearTimeout(timer);
