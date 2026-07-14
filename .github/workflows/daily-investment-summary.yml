@@ -37,5 +37,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Add daily investment summary $(TZ=Asia/Tokyo date +%Y-%m-%d)"
-            git push
+            # レポート生成中に main が進んでいても push が拒否されないように取り込む
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
