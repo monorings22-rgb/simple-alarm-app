@@ -1,7 +1,8 @@
-"""Stooq の無料 CSV API から株価・指数・為替のデータを取得する。
+"""株価・指数・為替の日足データを取得する。
 
-Stooq はAPIキー不要で日足の履歴CSVを配信している。
-シンボル例: ^spx (S&P 500), ^nkx (日経平均), aapl.us (Apple), 7203.jp (トヨタ), usdjpy (ドル円)
+Yahoo Finance の chart API(キー不要)を優先し、失敗時は Stooq の無料 CSV API にフォールバックする。
+config のシンボルは Stooq 形式で統一: ^spx (S&P 500), ^nkx (日経平均), aapl.us (Apple),
+7203.jp (トヨタ), usdjpy (ドル円)。Yahoo 用シンボルへは内部で変換する。
 """
 
 from __future__ import annotations
@@ -9,18 +10,70 @@ from __future__ import annotations
 import csv
 import io
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
+from urllib.parse import quote
 
 import requests
 
 logger = logging.getLogger(__name__)
 
+YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
 STOOQ_HISTORY_URL = "https://stooq.com/q/d/l/"
-USER_AGENT = "investment-summary-bot/1.0"
+# GitHub Actions などのデータセンターIPからは bot 風UAが拒否されやすいため、ブラウザ相当のUAを使う
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+
+# Stooq形式 → Yahoo形式の指数マッピング
+_INDEX_MAP = {
+    "^spx": "^GSPC",
+    "^ndq": "^IXIC",
+    "^dji": "^DJI",
+    "^nkx": "^N225",
+    "^tpx": "^TPX",
+}
 
 
-def fetch_history(symbol: str, lookback_days: int = 30) -> list[dict]:
-    """直近 lookback_days 日分の日足データを取得する(古い順)。"""
+def to_yahoo_symbol(symbol: str) -> str:
+    """Stooq形式のシンボルを Yahoo Finance 形式へ変換する。"""
+    s = symbol.lower()
+    if s in _INDEX_MAP:
+        return _INDEX_MAP[s]
+    if s.endswith(".us"):
+        return s[:-3].upper()  # aapl.us → AAPL
+    if s.endswith(".jp"):
+        return s[:-3].upper() + ".T"  # 7203.jp → 7203.T
+    if len(s) == 6 and s.isalpha():
+        return s.upper() + "=X"  # usdjpy → USDJPY=X
+    return symbol.upper()
+
+
+def fetch_history_yahoo(symbol: str, lookback_days: int = 30) -> list[dict]:
+    """Yahoo Finance chart API から日足データを取得する(古い順)。"""
+    ysym = to_yahoo_symbol(symbol)
+    resp = requests.get(
+        YAHOO_CHART_URL.format(symbol=quote(ysym)),
+        params={"range": "1mo", "interval": "1d"},
+        headers={"User-Agent": USER_AGENT},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    result = resp.json()["chart"]["result"][0]
+    timestamps = result.get("timestamp") or []
+    closes = (result.get("indicators", {}).get("quote") or [{}])[0].get("close") or []
+    rows = [
+        {
+            "Date": datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d"),
+            "Close": str(close),
+        }
+        for ts, close in zip(timestamps, closes)
+        if close is not None
+    ]
+    if not rows:
+        raise ValueError(f"yahoo returned no data for {symbol!r} ({ysym})")
+    return rows
+
+
+def fetch_history_stooq(symbol: str, lookback_days: int = 30) -> list[dict]:
+    """Stooq の無料 CSV API から日足データを取得する(古い順)。"""
     end = date.today()
     start = end - timedelta(days=lookback_days)
     resp = requests.get(
@@ -42,6 +95,15 @@ def fetch_history(symbol: str, lookback_days: int = 30) -> list[dict]:
     if not rows:
         raise ValueError(f"stooq returned empty history for {symbol!r}")
     return rows
+
+
+def fetch_history(symbol: str, lookback_days: int = 30) -> list[dict]:
+    """Yahoo → Stooq の順で試して日足データを返す。"""
+    try:
+        return fetch_history_yahoo(symbol, lookback_days)
+    except Exception as exc:
+        logger.info("Yahooからの取得に失敗、Stooqへフォールバック: %s (%s)", symbol, exc)
+        return fetch_history_stooq(symbol, lookback_days)
 
 
 def _pct(new: float, old: float) -> float:

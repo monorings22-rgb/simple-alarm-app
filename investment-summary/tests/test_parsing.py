@@ -8,7 +8,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from investment_summary.feeds import parse_feed
-from investment_summary.market import summarize_symbol
+from investment_summary.market import summarize_symbol, to_yahoo_symbol
 
 RSS_SAMPLE = b"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -53,6 +53,15 @@ class ParseFeedTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0]["title"], "What are your moves tomorrow?")
         self.assertEqual(items[0]["summary"], "Daily discussion thread")
+
+
+class YahooSymbolTest(unittest.TestCase):
+    def test_mapping(self):
+        self.assertEqual(to_yahoo_symbol("^spx"), "^GSPC")
+        self.assertEqual(to_yahoo_symbol("^nkx"), "^N225")
+        self.assertEqual(to_yahoo_symbol("aapl.us"), "AAPL")
+        self.assertEqual(to_yahoo_symbol("7203.jp"), "7203.T")
+        self.assertEqual(to_yahoo_symbol("usdjpy"), "USDJPY=X")
 
 
 class MarketSummaryTest(unittest.TestCase):
