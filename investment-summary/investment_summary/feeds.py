@@ -8,6 +8,7 @@ from __future__ import annotations
 import html
 import logging
 import re
+import time
 import xml.etree.ElementTree as ET
 
 import requests
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 USER_AGENT = "investment-summary-bot/1.0 (daily market digest)"
 SUMMARY_MAX_CHARS = 240
+RETRY_DELAYS = (5, 15)  # 429/5xx 時のリトライ待機秒数(Reddit はレート制限が厳しい)
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
@@ -56,9 +58,23 @@ def parse_feed(content: bytes) -> list[dict]:
     return items
 
 
-def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
-    resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
+def _get_with_retry(url: str) -> requests.Response:
+    """429 / 5xx のときだけ待機してリトライする。"""
+    for attempt, delay in enumerate((0,) + RETRY_DELAYS):
+        if delay:
+            time.sleep(delay)
+        resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
+        if resp.status_code == 429 or resp.status_code >= 500:
+            logger.info("HTTP %s のためリトライします (%d回目): %s", resp.status_code, attempt + 1, url)
+            continue
+        resp.raise_for_status()
+        return resp
     resp.raise_for_status()
+    return resp
+
+
+def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
+    resp = _get_with_retry(url)
     items = []
     for entry in parse_feed(resp.content)[:max_items]:
         summary = entry["summary"]
