@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Invitation</title>
+<style>
+  /* ============================================================
+     ▼▼▼ ここを書き換えるだけで内容をカスタマイズできます ▼▼▼
+     （名前・日付・会場・RSVP送信先などは <script> 内の CONFIG）
+     ============================================================ */
+  :root {
+    --bg: #faf7f2;
+    --paper: #ffffff;
+    --ink: #3a3530;
+    --ink-soft: #6b6259;
+    --line: #e6ddd0;
+    --gold: #b89b6e;
+    --gold-soft: #d8c7a6;
+    --rose: #c98a86;
+    --shadow: 0 10px 40px rgba(90, 70, 40, 0.12);
+    --serif: 'Georgia', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --sans: 'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    --script: 'Snell Roundhand', 'Segoe Script', cursive;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.9;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .frame {
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 32px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(216,199,166,0.25), transparent 60%),
+      linear-gradient(160deg, #fbf8f3 0%, #f3ece0 100%);
+  }
+  .hero::before,
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 56px;
+    background: var(--gold-soft);
+  }
+  .hero::before { top: 36px; }
+  .hero::after  { bottom: 36px; }
+
+  .hero .kicker {
+    font-family: var(--script);
+    font-size: 2.4rem;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .hero .names {
+    font-family: var(--serif);
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    margin: 14px 0;
+    line-height: 1.5;
+  }
+  .hero .amp {
+    display: block;
+    font-family: var(--script);
+    font-size: 2.2rem;
+    color: var(--rose);
+    margin: 4px 0;
+    font-weight: normal;
+  }
+  .hero .date {
+    font-family: var(--serif);
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+    margin-top: 20px;
+    font-size: 1.05rem;
+  }
+  .hero .venue-mini {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    margin-top: 6px;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 60px;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+  /* ---------- Section ---------- */
+  section { padding: 64px 32px; }
+  .section-label {
+    text-align: center;
+    font-family: var(--script);
+    font-size: 1.7rem;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    text-align: center;
+    font-family: var(--serif);
+    letter-spacing: 0.24em;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 36px;
+    text-transform: uppercase;
+  }
+
+  .message {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    max-width: 40ch;
+    margin: 0 auto;
+  }
+  .message p + p { margin-top: 1.2em; }
+
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold-soft);
+    margin: 40px auto;
+    position: relative;
+  }
+  .divider::after {
+    content: "❦";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--paper);
+    color: var(--gold);
+    padding: 0 12px;
+    font-size: 0.9rem;
+  }
+  .alt { background: linear-gradient(180deg, #fbf8f3, #f6efe4); }
+  .alt .divider::after { background: #f8f2e8; }
+
+  /* ---------- Info table ---------- */
+  .info { max-width: 400px; margin: 0 auto; }
+  .info-row {
+    display: flex;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .k {
+    flex: 0 0 84px;
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    padding-top: 3px;
+  }
+  .info-row .v { flex: 1; }
+  .info-row .v .big { font-size: 1.05rem; font-weight: 600; }
+  .info-row .v .sub { font-size: 0.85rem; color: var(--ink-soft); }
+  .map-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--rose);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-soft);
+    padding-bottom: 2px;
+  }
+
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 36px;
+  }
+  .cd-cell { text-align: center; }
+  .cd-cell .n {
+    font-family: var(--serif);
+    font-size: 1.9rem;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .cd-cell .l {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* ---------- RSVP form ---------- */
+  .rsvp { background: linear-gradient(180deg, #f6efe4, #f1e7d7); }
+  form { max-width: 400px; margin: 0 auto; }
+  .field { margin-bottom: 22px; }
+  .field label {
+    display: block;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .field label .req { color: var(--rose); margin-left: 4px; }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    font-family: var(--sans);
+    font-size: 1rem;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,155,110,0.15);
+  }
+  .field textarea { resize: vertical; min-height: 84px; }
+
+  .attend-toggle { display: flex; gap: 12px; }
+  .attend-toggle label {
+    flex: 1;
+    margin: 0;
+    cursor: pointer;
+  }
+  .attend-toggle input { position: absolute; opacity: 0; }
+  .attend-toggle .box {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+  .attend-toggle input:checked + .box {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(184,155,110,0.35);
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .submit-btn:hover { background: #52493f; }
+  .submit-btn:active { transform: scale(0.99); }
+  .submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+  .form-note {
+    text-align: center;
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin-top: 16px;
+    line-height: 1.7;
+  }
+
+  .thanks {
+    text-align: center;
+    display: none;
+  }
+  .thanks.show { display: block; animation: fade 0.6s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  .thanks .ck {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 20px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center;
+    padding: 48px 32px 64px;
+    background: var(--paper);
+  }
+  footer .kicker {
+    font-family: var(--script);
+    font-size: 1.8rem;
+    color: var(--gold);
+  }
+  footer .thank { color: var(--ink-soft); font-size: 0.9rem; margin-top: 12px; }
+  footer .sig {
+    font-family: var(--serif);
+    letter-spacing: 0.1em;
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 400px) {
+    .hero .names { font-size: 1.7rem; }
+    .countdown { gap: 12px; }
+    .cd-cell .n { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero">
+    <div class="kicker">We're getting married</div>
+    <div class="names" id="heroNames">Taro &amp; Hanako</div>
+    <div class="date" id="heroDate">2026 . 10 . 24</div>
+    <div class="venue-mini" id="heroVenue">at Grand Garden, Tokyo</div>
+    <div class="scroll-hint">SCROLL</div>
+  </header>
+
+  <!-- ===================== GREETING ===================== -->
+  <section class="reveal">
+    <div class="section-label">Greeting</div>
+    <div class="section-title">ご挨拶</div>
+    <div class="message" id="greeting">
+      <p>謹啓 皆様におかれましては ますますご清祥のこととお慶び申し上げます</p>
+      <p>このたび 私たちは結婚式を挙げることになりました</p>
+      <p>日頃お世話になっております皆様に お集まりいただき ささやかながら小宴を催したく存じます</p>
+      <p>ご多用中とは存じますが ぜひご出席賜りますようお願い申し上げます</p>
+    </div>
+    <div class="divider"></div>
+  </section>
+
+  <!-- ===================== EVENT INFO ===================== -->
+  <section class="alt reveal">
+    <div class="section-label">Information</div>
+    <div class="section-title">挙式のご案内</div>
+    <div class="info" id="infoTable"><!-- filled by JS --></div>
+    <div class="countdown" id="countdown"></div>
+  </section>
+
+  <!-- ===================== RSVP ===================== -->
+  <section class="rsvp reveal">
+    <div class="section-label">R.S.V.P.</div>
+    <div class="section-title">ご出欠のご連絡</div>
+
+    <form id="rsvpForm" novalidate>
+      <div class="field">
+        <label>ご出席・ご欠席<span class="req">*</span></label>
+        <div class="attend-toggle">
+          <label>
+            <input type="radio" name="attend" value="出席" required>
+            <span class="box">ご出席</span>
+          </label>
+          <label>
+            <input type="radio" name="attend" value="欠席">
+            <span class="box">ご欠席</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="name">お名前<span class="req">*</span></label>
+        <input type="text" id="name" name="name" placeholder="山田 太郎" required>
+      </div>
+
+      <div class="field">
+        <label for="kana">ふりがな</label>
+        <input type="text" id="kana" name="kana" placeholder="やまだ たろう">
+      </div>
+
+      <div class="field">
+        <label for="email">メールアドレス</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label for="guests">お連れ様の人数（ご本人を含む）</label>
+        <select id="guests" name="guests">
+          <option value="1">1名</option>
+          <option value="2">2名</option>
+          <option value="3">3名</option>
+          <option value="4">4名</option>
+          <option value="5">5名以上</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="allergy">アレルギー・食事のご希望</label>
+        <input type="text" id="allergy" name="allergy" placeholder="例）えび・かに">
+      </div>
+
+      <div class="field">
+        <label for="message">メッセージ（任意）</label>
+        <textarea id="message" name="message" placeholder="お祝いのメッセージやリクエストなど"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">送信する</button>
+      <p class="form-note" id="deadlineNote"></p>
+    </form>
+
+    <div class="thanks" id="thanks">
+      <div class="ck">✓</div>
+      <div class="message">
+        <p>ご返信ありがとうございました。<br>当日お会いできることを楽しみにしております。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="reveal">
+    <div class="kicker">Thank you</div>
+    <p class="thank">最後までご覧いただき<br>ありがとうございました</p>
+    <div class="sig" id="footSig">Taro &amp; Hanako</div>
+  </footer>
+
+</div>
+
+<script>
+/* ============================================================
+   ▼▼▼ CONFIG — ここを編集してください ▼▼▼
+   ============================================================ */
+const CONFIG = {
+  // お二人の名前
+  groom: "Taro",
+  bride: "Hanako",
+  namesJa: "山田 太郎 ・ 佐藤 花子",
+
+  // 挙式日時（ISO形式：カウントダウンに使用）
+  dateISO: "2026-10-24T11:00:00+09:00",
+  dateDisplay: "2026 . 10 . 24",       // ヒーロー表示用
+  dayOfWeek: "土曜日",
+
+  // 会場
+  venueName: "グランドガーデン東京",
+  venueNameEn: "Grand Garden, Tokyo",
+  venueAddress: "東京都千代田区丸の内1-1-1",
+  // Googleマップ検索用（住所や施設名でOK）
+  mapQuery: "グランドガーデン東京",
+
+  // スケジュール
+  reception: "受付　10:30",
+  ceremony:  "挙式　11:00",
+  party:     "披露宴 12:00",
+
+  // 返信締切
+  deadline: "2026年9月30日",
+
+  /* --- RSVP送信方法 ---
+     方法A（推奨）: Formspree などのフォームサービスのエンドポイントURLを設定
+        → https://formspree.io で無料登録し、フォームIDを貼り付け
+     方法B: 空欄("")のままにすると、メール送信(mailto)に切り替わります */
+  formEndpoint: "",                 // 例: "https://formspree.io/f/xxxxxxx"
+  contactEmail: "your-email@example.com"  // mailto用の宛先
+};
+/* ============================================================
+   ▲▲▲ CONFIG ここまで ▲▲▲
+   ============================================================ */
+
+// --- ヒーロー & フッターに反映 ---
+document.getElementById('heroNames').innerHTML = CONFIG.groom + ' &amp; ' + CONFIG.bride;
+document.getElementById('footSig').innerHTML   = CONFIG.groom + ' &amp; ' + CONFIG.bride;
+document.getElementById('heroDate').textContent = CONFIG.dateDisplay;
+document.getElementById('heroVenue').textContent = 'at ' + CONFIG.venueNameEn;
+document.title = CONFIG.groom + ' & ' + CONFIG.bride + ' Wedding Invitation';
+
+// --- 会場情報テーブル ---
+const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.mapQuery);
+document.getElementById('infoTable').innerHTML = `
+  <div class="info-row">
+    <div class="k">DATE</div>
+    <div class="v">
+      <div class="big">${CONFIG.dateDisplay.replace(/\s/g,'')}</div>
+      <div class="sub">${CONFIG.dayOfWeek}</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <div class="k">TIME</div>
+    <div class="v">
+      <div class="sub">${CONFIG.reception}</div>
+      <div class="sub">${CONFIG.ceremony}</div>
+      <div class="sub">${CONFIG.party}</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <div class="k">PLACE</div>
+    <div class="v">
+      <div class="big">${CONFIG.venueName}</div>
+      <div class="sub">${CONFIG.venueAddress}</div>
+      <a class="map-link" href="${mapUrl}" target="_blank" rel="noopener">Google マップで見る →</a>
+    </div>
+  </div>
+`;
+
+document.getElementById('deadlineNote').innerHTML =
+  'お手数ですが <strong>' + CONFIG.deadline + '</strong> までにご返信ください';
+
+// --- カウントダウン ---
+const cdEl = document.getElementById('countdown');
+function renderCountdown() {
+  const target = new Date(CONFIG.dateISO).getTime();
+  const now = Date.now();
+  let diff = Math.max(0, target - now);
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor(diff % 86400000 / 3600000);
+  const m = Math.floor(diff % 3600000 / 60000);
+  const cells = [[d,'Days'],[h,'Hours'],[m,'Min']];
+  if (diff === 0) { cdEl.innerHTML = '<div class="cd-cell"><div class="n">♥</div><div class="l">Today</div></div>'; return; }
+  cdEl.innerHTML = cells.map(c =>
+    `<div class="cd-cell"><div class="n">${c[0]}</div><div class="l">${c[1]}</div></div>`
+  ).join('');
+}
+renderCountdown();
+setInterval(renderCountdown, 60000);
+
+// --- スクロールで表示アニメーション ---
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// --- RSVPフォーム送信 ---
+const form = document.getElementById('rsvpForm');
+const thanks = document.getElementById('thanks');
+const submitBtn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!form.reportValidity()) return;
+
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  // 方法A: Formspree等のエンドポイントがあれば非同期POST
+  if (CONFIG.formEndpoint) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中...';
+    try {
+      const res = await fetch(CONFIG.formEndpoint, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+      if (!res.ok) throw new Error('送信に失敗しました');
+      showThanks();
+    } catch (err) {
+      alert('送信に失敗しました。時間をおいて再度お試しください。\n' + err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = '送信する';
+    }
+    return;
+  }
+
+  // 方法B: メール(mailto)で送信
+  const subject = encodeURIComponent('【結婚式RSVP】' + (data.name || '') + ' 様');
+  const bodyLines = [
+    '出欠：' + (data.attend || ''),
+    'お名前：' + (data.name || ''),
+    'ふりがな：' + (data.kana || ''),
+    'メール：' + (data.email || ''),
+    '人数：' + (data.guests || ''),
+    'アレルギー等：' + (data.allergy || ''),
+    'メッセージ：' + (data.message || '')
+  ];
+  const body = encodeURIComponent(bodyLines.join('\n'));
+  window.location.href = 'mailto:' + CONFIG.contactEmail + '?subject=' + subject + '&body=' + body;
+  showThanks();
+});
+
+function showThanks() {
+  form.style.display = 'none';
+  document.getElementById('deadlineNote').style.display = 'none';
+  thanks.classList.add('show');
+  thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>
